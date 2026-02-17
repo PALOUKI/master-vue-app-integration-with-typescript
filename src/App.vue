@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import HomeView from "@/views/HomeView.vue"
+import NavBar  from "@/components/NavBar.vue"
 
 </script>
 
 <template>
-  <HomeView />
+  <div v-if="$route.name && String($route.name).startsWith('home')">
+    <NavBar />
+  </div>
+  <RouterView />
 </template>
 
 <style scoped></style>

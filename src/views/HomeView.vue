@@ -1,3 +1,7 @@
 <template>
-    <h1>Home View</h1>
+    <div class="home-content pt-20">
+        <h1>
+            Welcome on my web page
+        </h1>
+    </div>
 </template>
