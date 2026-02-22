@@ -13,7 +13,8 @@
                     label="Your username"
                     id="username"
                     placeholder="your-username"
-                    required
+                    :error="errors.username"
+                    @input="errors.username = ''"
                 />
 
                 <BaseInput 
@@ -22,15 +23,13 @@
                     id="password"
                     type="password"
                     placeholder="•••••••••"
-                    required
+                    :error="errors.password"
+                    @input="errors.password = ''"
                 />
-
-                <div class="flex items-start my-6">
-                    </div>
                 
-                <button type="submit" :disabled="authStore.loading" :class="[authStore.loading ? 'bg-gray-400' : 'hover:bg-brand-strong bg-brand']" class="text-white box-border border border-transparent focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none w-full mb-3">
-                    {{ authStore.loading ? 'Loading...' : 'Login to your account' }}
-                </button>
+                <PrimaryButton :loading="authStore.loading">
+                    Login to your account
+                </PrimaryButton>
                 <div class="text-sm font-medium text-body">Not registered? <a href="#" class="text-fg-brand hover:underline">Create account</a></div>
             </form>
         </div>
@@ -39,8 +38,10 @@
 
 <script setup lang="ts">
 import BaseInput from '@/components/BaseInput.vue' 
+import PrimaryButton from '@/components/PrimaryButton.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
+import { toast } from 'vue-sonner'
 import { reactive } from 'vue'
 import type { LoginRequest } from '@/interfaces/auth'
 
@@ -50,13 +51,40 @@ const form = reactive<LoginRequest>({
     username: '',
     password: ''
 })
+const errors = reactive({
+    username: '',
+    password: ''
+})
+
+const validate = () => {
+    let isValid = true
+    errors.username = ''
+    errors.password = ''
+    if(!form.username.trim()){
+        errors.username = "The username is required"
+        isValid = false
+    }
+    if(!form.password.trim()){
+        errors.password = "The password is required"
+        isValid = false
+    } else if (form.password.trim().length < 6) {
+        errors.password = "Le mot de passe doit faire au moins 6 caractères"
+        isValid = false
+    }
+    return isValid
+}
 
 const login = async () => {
-    if(form.username.trim().length > 0 && form.password.trim().length > 0 ){
-        await authStore.login(form)
-        if (authStore.user) router.push('/welcome')
-    }
+    if(!validate()) return
 
+    await authStore.login(form)
+    if (authStore.user) {
+        router.push('/welcome')
+        toast.success("Bienvenue !", {
+            description: `Ravi de vous voir de nouveau ${authStore.user.username}`,
+            duration: 4000,
+        })
+    }
     form.username = ''
     form.password = ''
 }
