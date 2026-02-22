@@ -43,6 +43,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { reactive } from 'vue'
+import { routes } from '@/router/index'
 import type { LoginRequest } from '@/interfaces/auth'
 
 const authStore = useAuthStore()
@@ -79,7 +80,7 @@ const login = async () => {
 
     await authStore.login(form)
     if (authStore.user) {
-        router.push('/welcome')
+        router.push({name: routes.home })
         toast.success("Bienvenue !", {
             description: `Ravi de vous voir de nouveau ${authStore.user.username}`,
             duration: 4000,
